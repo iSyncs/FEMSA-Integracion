@@ -50,7 +50,7 @@ jobs:
 
       - uses: actions/checkout@v5
         if: steps.config.outputs.listo == 'true'
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         if: steps.config.outputs.listo == 'true'
         with:
           node-version-file: .nvmrc
