@@ -1,0 +1,8 @@
+# Quién revisa qué. GitHub pide su revisión automáticamente en cada PR.
+# Los usuarios deben tener acceso de escritura al repo para que cuente.
+
+*                    @iSyncs
+/.github/            @iSyncs
+/db/                 @iSyncs @EmilianoCBE
+/backend-auditoria/  @iSyncs
+/backend-riesgos/    @EmilianoCBE
