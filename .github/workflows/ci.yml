@@ -1,0 +1,217 @@
+# Integración y despliegue continuos del repositorio unido.
+#
+# - En cada PR hacia develop o main se valida (sin desplegar).
+# - En cada merge a develop se despliega a staging; en cada merge a main, a producción.
+# - Cada parte (frontend, backend-auditoria, backend-riesgos) se valida y despliega solo si ya tiene
+#   su package.json. Mientras la carpeta esté vacía, sus jobs se omiten.
+# - El job "CI OK" es el único que hay que exigir como requisito en la protección de ramas.
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # En PR se cancela la corrida anterior; en develop y main nunca se corta un despliegue a medias.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  detectar:
+    name: Detectar partes con código
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.partes.outputs.frontend }}
+      auditoria: ${{ steps.partes.outputs.auditoria }}
+      riesgos: ${{ steps.partes.outputs.riesgos }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: partes
+        run: |
+          for par in frontend:frontend backend-auditoria:auditoria backend-riesgos:riesgos; do
+            carpeta="${par%%:*}"; nombre="${par##*:}"
+            if [ -f "$carpeta/package.json" ]; then echo "$nombre=true"; else echo "$nombre=false"; fi >> "$GITHUB_OUTPUT"
+          done
+
+  repositorio:
+    name: Repositorio (Biome y archivos prohibidos)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Lint y formato (Biome)
+        run: npm run check
+      - name: Que no haya archivos .env versionados
+        run: |
+          archivos=$(git ls-files | grep -E '(^|/)\.env($|\.)' | grep -Ev '\.env(\.auth)?\.example$' || true)
+          if [ -n "$archivos" ]; then echo "::error::Hay archivos .env en el repositorio:"; echo "$archivos"; exit 1; fi
+
+  titulo-pr:
+    name: Título del PR
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Revisar formato tipo(ID) descripción
+        env:
+          TITULO: ${{ github.event.pull_request.title }}
+        run: |
+          if ! printf '%s' "$TITULO" | grep -Eq '^(feat|fix|test|refactor|docs|chore)(\([A-Za-z0-9._-]+\))?: .+'; then
+            echo "::error::El título del PR debe ser 'tipo(ID): descripción'. Tipos: feat, fix, test, refactor, docs, chore. Ejemplo: feat(HU05): crear solicitud PBC"
+            exit 1
+          fi
+
+  frontend:
+    name: Frontend (lint, tipos, pruebas y build)
+    needs: detectar
+    if: needs.detectar.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+      # --if-present: si el script aún no existe, se omite. Cuando el frontend esté completo,
+      # quitar --if-present para que un script faltante sea un error.
+      - run: npm run check --if-present
+      - run: npm run typecheck --if-present
+      - run: npm test --if-present
+      - run: npm run build --if-present
+
+  e2e-frontend:
+    name: Frontend (Cypress)
+    needs: [detectar, frontend]
+    if: needs.detectar.outputs.frontend == 'true' && hashFiles('frontend/cypress.config.*') != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build, servidor y Cypress
+        uses: cypress-io/github-action@v7
+        with:
+          working-directory: frontend
+          build: npm run build
+          start: npm run preview
+          wait-on: http://127.0.0.1:4173
+      - name: Capturas de pruebas fallidas
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots
+          if-no-files-found: ignore
+
+  backend-auditoria:
+    name: Backend auditoría (tipos, pruebas y build)
+    needs: detectar
+    if: needs.detectar.outputs.auditoria == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: backend-auditoria
+    env:
+      # Las pruebas usan datos en memoria y una IA simulada: no tocan Azure SQL ni gastan créditos.
+      DATA_SOURCE: memoria
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: backend-auditoria/package-lock.json
+      - run: npm ci
+      - name: Revisión de tipos
+        run: npx tsc --noEmit -p tsconfig.json
+      - run: npm test --if-present
+      - run: npm run test:e2e --if-present
+      - run: npm run build --if-present
+
+  backend-riesgos:
+    name: Backend riesgos (pruebas)
+    needs: detectar
+    if: needs.detectar.outputs.riesgos == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: backend-riesgos
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: backend-riesgos/package-lock.json
+      - run: npm ci
+      # Las pruebas simulan la base: el CI nunca se conecta a Azure.
+      - run: npm run test:coverage --if-present
+      - run: npm test --if-present
+
+  ci-ok:
+    name: CI OK
+    # Un solo resultado para exigir en la protección de ramas. Los jobs omitidos cuentan como correctos.
+    if: always()
+    needs: [repositorio, titulo-pr, frontend, e2e-frontend, backend-auditoria, backend-riesgos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Revisar resultados
+        env:
+          RESULTADOS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Resultados: $RESULTADOS"
+          case "$RESULTADOS" in *failure*|*cancelled*) echo "::error::Hay jobs fallidos o cancelados"; exit 1;; esac
+
+  desplegar-frontend:
+    name: Desplegar frontend
+    needs: [detectar, ci-ok]
+    if: github.event_name == 'push' && needs.detectar.outputs.frontend == 'true'
+    uses: ./.github/workflows/desplegar-vercel.yml
+    with:
+      sufijo: FRONTEND
+      entorno: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    secrets: inherit
+
+  desplegar-auditoria:
+    name: Desplegar backend auditoría
+    needs: [detectar, ci-ok]
+    if: github.event_name == 'push' && needs.detectar.outputs.auditoria == 'true'
+    uses: ./.github/workflows/desplegar-vercel.yml
+    with:
+      sufijo: AUDITORIA
+      entorno: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    secrets: inherit
+
+  desplegar-riesgos:
+    name: Desplegar backend riesgos
+    needs: [detectar, ci-ok]
+    if: github.event_name == 'push' && needs.detectar.outputs.riesgos == 'true'
+    uses: ./.github/workflows/desplegar-vercel.yml
+    with:
+      sufijo: RIESGOS
+      entorno: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    secrets: inherit

@@ -1,0 +1,89 @@
+# Despliegue de una parte del repo a Vercel desde GitHub Actions (la integración Git de Vercel va apagada).
+# Lo llama ci.yml después de que "CI OK" pasa. Cada parte es un proyecto de Vercel distinto, con su
+# "Root Directory" configurado (frontend, backend-auditoria o backend-riesgos).
+#
+# Secrets del repo (ver docs/guias/configurar-github.md):
+#   VERCEL_TOKEN, VERCEL_ORG_ID
+#   VERCEL_PROJECT_ID_FRONTEND, VERCEL_PROJECT_ID_AUDITORIA, VERCEL_PROJECT_ID_RIESGOS
+# Si falta alguno, el job avisa y termina sin error: así el repo puede crecer antes de tener Vercel listo.
+name: Desplegar en Vercel
+
+on:
+  workflow_call:
+    inputs:
+      sufijo:
+        description: FRONTEND, AUDITORIA o RIESGOS (nombre del secret del proyecto)
+        required: true
+        type: string
+      entorno:
+        description: staging o production
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  desplegar:
+    name: Vercel (${{ inputs.sufijo }} a ${{ inputs.entorno }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: ${{ inputs.entorno }}
+    env:
+      VERCEL_CLI: vercel@64.3.1
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets[format('VERCEL_PROJECT_ID_{0}', inputs.sufijo)] }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_TELEMETRY_DISABLED: 1
+      PRODUCCION: ${{ inputs.entorno == 'production' }}
+    steps:
+      - name: Revisar configuración de Vercel
+        id: config
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::notice::Faltan secrets de Vercel para ${{ inputs.sufijo }}; se omite el despliegue."
+            echo "listo=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "listo=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v5
+        if: steps.config.outputs.listo == 'true'
+      - uses: actions/setup-node@v5
+        if: steps.config.outputs.listo == 'true'
+        with:
+          node-version-file: .nvmrc
+
+      - name: Instalar Vercel CLI
+        if: steps.config.outputs.listo == 'true'
+        run: npm install --global "$VERCEL_CLI"
+
+      - name: Descargar configuración del proyecto
+        if: steps.config.outputs.listo == 'true'
+        run: vercel pull --yes --environment=${{ inputs.entorno == 'production' && 'production' || 'preview' }} --token="$VERCEL_TOKEN"
+
+      - name: Build
+        if: steps.config.outputs.listo == 'true'
+        run: vercel build ${{ inputs.entorno == 'production' && '--prod' || '' }} --token="$VERCEL_TOKEN"
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+
+      - name: Publicar
+        id: publicar
+        if: steps.config.outputs.listo == 'true'
+        run: |
+          if [ "$PRODUCCION" = "true" ]; then
+            url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          else
+            url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "### ${{ inputs.sufijo }} desplegado en $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Prueba de humo (que responda sin error del servidor)
+        if: steps.config.outputs.listo == 'true'
+        run: |
+          codigo=$(curl --silent --output /dev/null --write-out '%{http_code}' --retry 5 --retry-delay 5 --retry-all-errors "${{ steps.publicar.outputs.url }}")
+          echo "Respuesta: $codigo"
+          [ "$codigo" -lt 500 ]
