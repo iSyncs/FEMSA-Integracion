@@ -1,0 +1,17 @@
+{
+  "name": "femsa-integracion",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Repositorio unido de Auditoria Interna FEMSA (Equipo 2 y Equipo 11)",
+  "scripts": {
+    "check": "biome ci .",
+    "format": "biome format --write .",
+    "lint": "biome lint ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

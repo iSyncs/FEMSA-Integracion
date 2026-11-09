@@ -1,0 +1,51 @@
+# Sistema y editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Dependencias y compilados
+node_modules/
+dist/
+build/
+coverage/
+.nyc_output/
+
+# Variables de entorno: solo se sube el ejemplo
+.env
+.env.*
+!.env.example
+!.env.auth.example
+
+# Credenciales locales
+*.local
+*.local.md
+*.pem
+*.key
+*.pfx
+*.p12
+*.cer
+*.crt
+credentials*.json
+secrets*.json
+
+# Pruebas
+cypress/downloads/
+cypress/screenshots/
+cypress/videos/
+
+# Vercel y Azure local
+.vercel/
+.azure/
+__blobstorage__/
+__queuestorage__/
+__tablestorage__/
+
+# Logs y temporales
+*.log
+tmp/
+uploads/
+
+# Configuración local de Claude Code
+.claude/
