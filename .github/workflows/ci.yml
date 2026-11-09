@@ -30,6 +30,7 @@ jobs:
       frontend: ${{ steps.partes.outputs.frontend }}
       auditoria: ${{ steps.partes.outputs.auditoria }}
       riesgos: ${{ steps.partes.outputs.riesgos }}
+      cypress: ${{ steps.partes.outputs.cypress }}
     steps:
       - uses: actions/checkout@v5
       - id: partes
@@ -38,6 +39,7 @@ jobs:
             carpeta="${par%%:*}"; nombre="${par##*:}"
             if [ -f "$carpeta/package.json" ]; then echo "$nombre=true"; else echo "$nombre=false"; fi >> "$GITHUB_OUTPUT"
           done
+          if ls frontend/cypress.config.* >/dev/null 2>&1; then echo "cypress=true"; else echo "cypress=false"; fi >> "$GITHUB_OUTPUT"
 
   repositorio:
     name: Repositorio (Biome y archivos prohibidos)
@@ -100,7 +102,7 @@ jobs:
   e2e-frontend:
     name: Frontend (Cypress)
     needs: [detectar, frontend]
-    if: needs.detectar.outputs.frontend == 'true' && hashFiles('frontend/cypress.config.*') != ''
+    if: needs.detectar.outputs.cypress == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
