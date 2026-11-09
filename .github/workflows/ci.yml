@@ -2,8 +2,9 @@
 #
 # - En cada PR hacia develop o main se valida (sin desplegar).
 # - En cada merge a develop se despliega a staging; en cada merge a main, a producción.
-# - Cada parte (frontend, backend-auditoria, backend-riesgos) se valida y despliega solo si ya tiene
-#   su package.json. Mientras la carpeta esté vacía, sus jobs se omiten.
+# - Cada parte (frontend, backend-auditoria, backend-riesgos) se valida solo si ya tiene su
+#   package.json. Mientras la carpeta esté vacía, sus jobs se omiten.
+# - Las tres partes se despliegan juntas en un solo proyecto de Vercel (vercel.json en la raíz).
 # - El job "CI OK" es el único que hay que exigir como requisito en la protección de ramas.
 name: CI
 
@@ -188,32 +189,14 @@ jobs:
           echo "Resultados: $RESULTADOS"
           case "$RESULTADOS" in *failure*|*cancelled*) echo "::error::Hay jobs fallidos o cancelados"; exit 1;; esac
 
-  desplegar-frontend:
-    name: Desplegar frontend
+  desplegar:
+    name: Desplegar
     needs: [detectar, ci-ok]
-    if: github.event_name == 'push' && needs.detectar.outputs.frontend == 'true'
+    # Solo lo que ya entró a develop o main, y solo si alguna parte tiene código.
+    if: >-
+      github.event_name == 'push' &&
+      (needs.detectar.outputs.frontend == 'true' || needs.detectar.outputs.auditoria == 'true' || needs.detectar.outputs.riesgos == 'true')
     uses: ./.github/workflows/desplegar-vercel.yml
     with:
-      sufijo: FRONTEND
-      entorno: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
-    secrets: inherit
-
-  desplegar-auditoria:
-    name: Desplegar backend auditoría
-    needs: [detectar, ci-ok]
-    if: github.event_name == 'push' && needs.detectar.outputs.auditoria == 'true'
-    uses: ./.github/workflows/desplegar-vercel.yml
-    with:
-      sufijo: AUDITORIA
-      entorno: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
-    secrets: inherit
-
-  desplegar-riesgos:
-    name: Desplegar backend riesgos
-    needs: [detectar, ci-ok]
-    if: github.event_name == 'push' && needs.detectar.outputs.riesgos == 'true'
-    uses: ./.github/workflows/desplegar-vercel.yml
-    with:
-      sufijo: RIESGOS
       entorno: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
     secrets: inherit
