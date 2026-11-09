@@ -1,6 +1,6 @@
 # 0004 · CI/CD con GitHub Actions y Vercel
 
-**Fecha:** 2026-11-09 · **Estado:** Aceptada
+**Fecha:** 2026-11-09 · **Estado:** Aceptada; la parte de "un proyecto de Vercel por parte" la reemplaza la [0007](0007-un-solo-proyecto-de-vercel.md)
 
 ## Contexto
 El Equipo 2 desplegaba con la integración Git de Vercel (un despliegue por PR y por merge, con tope de 50 imágenes del backend). Maple despliega desde GitHub Actions con la CLI de Vercel y tiene staging y producción. Carlos eligió Actions.

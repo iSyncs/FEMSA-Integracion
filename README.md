@@ -46,6 +46,7 @@ Todo corre en **GitHub Actions** ([.github/workflows](.github/workflows)):
 | Merge a `main` | Lo anterior y despliegue a **producción** en Vercel |
 
 - El job **CI OK** resume todo y es el que se exige para mergear.
+- Las tres partes se publican juntas en **un solo proyecto de Vercel** y un solo dominio ([vercel.json](vercel.json)).
 - Cada parte se valida y despliega solo cuando ya tiene su `package.json`.
 - Las pruebas usan datos en memoria y una IA simulada: nunca tocan Azure ni gastan créditos.
 - Los secrets y la puesta en marcha están en [docs/guias/configurar-github.md](docs/guias/configurar-github.md).

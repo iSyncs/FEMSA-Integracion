@@ -19,8 +19,19 @@ flowchart LR
 |---|---|
 | `/` y `/auditorias/*`, `/hallazgos/*`, `/seguimiento/*`, `/ia/*` | Frontend (módulo auditoría) |
 | `/maple/*` | Frontend (módulo riesgos) |
-| `/api/maple/*` | `backend-riesgos` |
+| `/api/maple/*` | `backend-riesgos` (le llega como `/api/*`, igual que en su repo) |
 | `/api/*` (lo demás) | `backend-auditoria` |
+
+Las tres partes son servicios de **un solo proyecto de Vercel** (`vercel.json` en la raíz, [ADR 0007](../decisiones/0007-un-solo-proyecto-de-vercel.md)). Se publican juntas en el mismo dominio, así la cookie de sesión sirve para todo y no hay CORS.
+
+## Dos backends, una sola página
+
+Para quien usa el sistema, la página se ve unificada por el dominio, el login, el menú y el diseño, no por la cantidad de servidores. Los backends se quedan separados por dominio de negocio, con estas reglas comunes:
+
+1. **Misma sesión:** solo `backend-auditoria` inicia sesión; `backend-riesgos` la valida con la misma cookie y `USER_SESSION`.
+2. **Mismos roles y permisos,** leídos de las mismas tablas.
+3. **Cada equipo es dueño de sus tablas.** Si una parte necesita datos de la otra, el frontend los pide a la API dueña. Un backend no consulta por su cuenta las tablas del otro.
+4. **Formato común:** un formato JSON de errores que acuerden los dos equipos, fechas en UTC y una sola bitácora (la del Equipo 2), donde los dos registran sus acciones.
 
 ## Qué aporta cada equipo
 
@@ -40,7 +51,7 @@ flowchart LR
 1. Traer el frontend de Maple como base TypeScript (`features/riesgos`) y el del Equipo 2 como `features/auditoria`.
 2. Un solo router y menú, con el login del Equipo 2.
 3. Lucide como set de iconos.
-4. Los backends siguen en sus repos de origen y el frontend apunta a ellos mientras tanto.
+4. Los backends siguen en sus repos de origen. Las variables `API_AUDITORIA_URL` y `API_RIESGOS_URL` mandan `/api/*` y `/api/maple/*` a sus despliegues actuales (ver [la guía](../guias/configurar-github.md)).
 5. Primer despliegue a staging.
 
 **Fase 2 · backends y base.**

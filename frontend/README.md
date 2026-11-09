@@ -24,9 +24,10 @@ frontend/
 │  │  └─ compartido/ lo que usan ambos (bitácora, notificaciones)
 │  └─ shared/        ui, hooks, lib y cliente de API
 ├─ cypress/          pruebas E2E
-├─ public/
-└─ vercel.json
+└─ public/
 ```
+
+No lleva `vercel.json` propio: el despliegue y las rutas están en el `vercel.json` de la raíz.
 
 ## Comandos esperados
 
