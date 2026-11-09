@@ -22,19 +22,15 @@ gh repo edit --visibility public --accept-visibility-change-consequences
 
 Esto exige PR, 1 aprobación y el check **CI OK** en `main` y `develop`, y bloquea el push directo y el borrado.
 
-## 3. Proyectos en Vercel
+## 3. Proyecto en Vercel
 
-Crea tres proyectos y, en cada uno, configura **Root Directory** y desactiva la integración Git (el despliegue lo hace Actions):
+Es **un solo proyecto** con tres servicios ([ADR 0007](../decisiones/0007-un-solo-proyecto-de-vercel.md)). Se crea una vez:
 
-| Proyecto | Root Directory | Secret del repo con su ID |
-|---|---|---|
-| frontend | `frontend` | `VERCEL_PROJECT_ID_FRONTEND` |
-| API de auditoría | `backend-auditoria` | `VERCEL_PROJECT_ID_AUDITORIA` |
-| API de riesgos | `backend-riesgos` | `VERCEL_PROJECT_ID_RIESGOS` |
+1. Importa el repo en Vercel con **Root Directory** en la raíz del repo (no en una subcarpeta). Vercel lee los servicios del `vercel.json` de la raíz.
+2. La integración Git queda apagada por `vercel.json` (`git.deploymentEnabled: false`): despliega GitHub Actions.
+3. Carga las variables de la aplicación (Azure SQL, Blob Storage, OpenRouter, Gemini, `CRON_SECRET`...) en el proyecto de Vercel, **no** en GitHub. Las ven los servicios que las usan.
 
-Variables de la aplicación (Azure, OpenRouter, Gemini, etc.) se cargan en cada proyecto de Vercel, **no** en GitHub.
-
-## 4. Secrets de GitHub
+## 4. Secrets y variables de GitHub
 
 Settings, Secrets and variables, Actions:
 
@@ -42,11 +38,22 @@ Settings, Secrets and variables, Actions:
 |---|---|
 | `VERCEL_TOKEN` | Token de Vercel con acceso al equipo |
 | `VERCEL_ORG_ID` | ID del equipo o cuenta en Vercel |
-| `VERCEL_PROJECT_ID_FRONTEND`, `_AUDITORIA`, `_RIESGOS` | IDs de los tres proyectos |
+| `VERCEL_PROJECT_ID` | ID del proyecto |
+
+Variables (pestaña *Variables*, no son secretas). Solo sirven mientras un backend siga en su repo de origen (Fase 1); se borran cuando su código llegue aquí:
+
+| Variable | Ejemplo | Efecto |
+|---|---|---|
+| `API_AUDITORIA_URL` | URL de producción actual del Equipo 2 | `/api/*` se manda a esa API |
+| `API_RIESGOS_URL` | `https://femsa-audit-api.vercel.app` | `/api/maple/*` se manda a esa API |
 
 Crea también los entornos `staging` y `production` (Settings, Environments). En `production` conviene pedir aprobación manual.
 
-Mientras falte algún secret, el despliegue de esa parte se omite con un aviso y el CI sigue en verde.
+Mientras falte algún secret, el despliegue se omite con un aviso y el CI sigue en verde. Para ver qué se va a desplegar sin publicar nada:
+
+```bash
+node scripts/ajustar-vercel.mjs
+```
 
 ## 5. Revisión
 
