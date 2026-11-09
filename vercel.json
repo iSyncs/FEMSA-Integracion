@@ -1,0 +1,37 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": { "deploymentEnabled": false },
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "vite",
+      "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+    },
+    "auditoria": {
+      "root": "backend-auditoria",
+      "runtime": "container"
+    },
+    "riesgos": {
+      "root": "backend-riesgos",
+      "framework": "express",
+      "rewrites": [{ "source": "/api/maple/:path(.*)?", "destination": "/api/:path" }]
+    }
+  },
+  "rewrites": [
+    { "source": "/api/maple/(.*)", "destination": { "service": "riesgos" } },
+    { "source": "/api/(.*)", "destination": { "service": "auditoria" } },
+    { "source": "/(.*)", "destination": { "service": "frontend" } }
+  ],
+  "crons": [{ "path": "/api/notificaciones/cron/vencimientos", "schedule": "0 13 * * *" }],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    }
+  ]
+}
