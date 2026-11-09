@@ -48,7 +48,7 @@ jobs:
             echo "listo=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: steps.config.outputs.listo == 'true'
       - uses: actions/setup-node@v5
         if: steps.config.outputs.listo == 'true'
