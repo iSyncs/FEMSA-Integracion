@@ -27,3 +27,4 @@ AzuriteConfig.json
 .npmrc
 credentials*.json
 secrets*.json
+herramientas/
