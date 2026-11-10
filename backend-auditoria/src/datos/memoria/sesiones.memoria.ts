@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { NuevaSesion, SesionesRepository } from '../repositorios/sesiones.repository';
+import { Injectable } from "@nestjs/common";
+import { NuevaSesion, SesionesRepository } from "../repositorios/sesiones.repository";
 
 @Injectable()
 export class SesionesMemoriaRepository extends SesionesRepository {

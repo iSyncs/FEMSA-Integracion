@@ -15,6 +15,6 @@ export abstract class SugerenciasIaRepository {
   abstract listar<P>(): Promise<AnalisisGuardado<P>[]>;
   abstract buscar<P>(auditoriaId: number, evidenciaId: number): Promise<AnalisisGuardado<P> | null>;
   abstract buscarPorId<P>(id: number): Promise<AnalisisGuardado<P> | null>;
-  abstract guardar<P>(datos: Omit<AnalisisGuardado<P>, 'id'> & { usuarioId: number }): Promise<AnalisisGuardado<P>>;
+  abstract guardar<P>(datos: Omit<AnalisisGuardado<P>, "id"> & { usuarioId: number }): Promise<AnalisisGuardado<P>>;
   abstract actualizar<P>(id: number, contenido: P): Promise<void>;
 }

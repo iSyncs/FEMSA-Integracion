@@ -1,4 +1,4 @@
-import { compare, hashSync } from 'bcryptjs';
+import { compare, hashSync } from "bcryptjs";
 
 const COSTO = 10;
 
@@ -7,6 +7,6 @@ export function hashContrasena(contrasena: string): string {
 }
 
 export async function verificarContrasena(contrasena: string, guardado: string | null): Promise<boolean> {
-  if (!guardado?.startsWith('$2')) return false;
+  if (!guardado?.startsWith("$2")) return false;
   return compare(contrasena, guardado);
 }

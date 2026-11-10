@@ -1,5 +1,5 @@
-import type { Control, Riesgo, UnidadNegocio } from '../modelos';
-import type { UsuarioSesion } from './vistas';
+import type { Control, Riesgo, UnidadNegocio } from "../modelos";
+import type { UsuarioSesion } from "./vistas";
 
 export abstract class UsuariosRepository {
   abstract listarActivos(): Promise<UsuarioSesion[]>;

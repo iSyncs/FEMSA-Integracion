@@ -1,6 +1,6 @@
-import { Global, Module } from '@nestjs/common';
-import { BitacoraController } from './bitacora.controller';
-import { BitacoraService } from './bitacora.service';
+import { Global, Module } from "@nestjs/common";
+import { BitacoraController } from "./bitacora.controller";
+import { BitacoraService } from "./bitacora.service";
 
 // global para que los demas modulos registren en la bitacora sin importarla
 @Global()

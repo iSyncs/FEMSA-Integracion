@@ -3,12 +3,24 @@
  * El canal de correo queda para después: hoy todo se guarda con canal 'plataforma'.
  */
 export interface NuevaNotificacion {
-  usuarioId: number; tipo: string; mensaje: string; planId?: number | null; auditoriaId?: number | null;
+  usuarioId: number;
+  tipo: string;
+  mensaje: string;
+  planId?: number | null;
+  auditoriaId?: number | null;
 }
 
 export interface NotificacionVista {
-  id: number; usuario_id: number; tipo: string; mensaje: string; fecha: Date; leida: boolean;
-  plan_id: number | null; plan_folio: string | null; auditoria_id: number | null; auditoria_folio: string | null;
+  id: number;
+  usuario_id: number;
+  tipo: string;
+  mensaje: string;
+  fecha: Date;
+  leida: boolean;
+  plan_id: number | null;
+  plan_folio: string | null;
+  auditoria_id: number | null;
+  auditoria_folio: string | null;
 }
 
 export abstract class NotificacionesRepository {

@@ -3,7 +3,11 @@
  * reutilizar una sesión.
  */
 export interface NuevaSesion {
-  usuarioId: number; tokenHash: string; expira: Date; ip: string | null; agente: string | null;
+  usuarioId: number;
+  tokenHash: string;
+  expira: Date;
+  ip: string | null;
+  agente: string | null;
 }
 
 export abstract class SesionesRepository {

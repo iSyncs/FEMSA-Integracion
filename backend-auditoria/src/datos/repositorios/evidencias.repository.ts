@@ -1,4 +1,4 @@
-import type { Evidencia } from '../modelos';
+import type { Evidencia } from "../modelos";
 
 export interface DestinoEvidencia {
   auditoriaId: number;
@@ -11,8 +11,8 @@ export interface EvidenciaConAuditoria extends Evidencia {
   cargado_por?: string;
 }
 
-export type NuevaEvidencia = Omit<Evidencia, 'id' | 'tracking_id' | 'fecha_carga' | 'eliminado' | 'evidencia_padre_id'>;
-export type EvidenciaHija = Pick<Evidencia, 'nombre_archivo' | 'tipo_mime' | 'tamano_bytes' | 'hash_sha256'>;
+export type NuevaEvidencia = Omit<Evidencia, "id" | "tracking_id" | "fecha_carga" | "eliminado" | "evidencia_padre_id">;
+export type EvidenciaHija = Pick<Evidencia, "nombre_archivo" | "tipo_mime" | "tamano_bytes" | "hash_sha256">;
 
 export abstract class EvidenciasRepository {
   abstract destinoValido(destino: DestinoEvidencia): Promise<boolean>;

@@ -1,5 +1,5 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
-import sql from 'mssql';
+import { Injectable, OnModuleDestroy } from "@nestjs/common";
+import sql from "mssql";
 
 export type Parametros = Record<string, unknown>;
 
@@ -23,17 +23,22 @@ export class ConexionSql implements OnModuleDestroy, Ejecutor {
 
   private obtener() {
     this.pool ??= new sql.ConnectionPool({
-      server: process.env.DB_HOST ?? '',
+      server: process.env.DB_HOST ?? "",
       port: Number(process.env.DB_PORT ?? 1433),
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      options: { encrypt: true, trustServerCertificate: process.env.DB_TRUST_CERT === 'true' },
+      options: { encrypt: true, trustServerCertificate: process.env.DB_TRUST_CERT === "true" },
       // Azure SQL serverless puede tardar casi un minuto en despertar.
       connectionTimeout: 90_000,
       requestTimeout: 60_000,
       pool: { max: 10, min: 0, idleTimeoutMillis: 30_000 },
-    }).connect().catch((e) => { this.pool = null; throw e; });
+    })
+      .connect()
+      .catch((e) => {
+        this.pool = null;
+        throw e;
+      });
     return this.pool;
   }
 
@@ -72,5 +77,5 @@ export async function siguienteFolio(tx: Ejecutor, tabla: string, prefijo: strin
        FROM dbo.[${tabla}] WITH (UPDLOCK, HOLDLOCK) WHERE tracking_id LIKE @patron`,
     { patron: `${prefijo}-%` },
   );
-  return `${prefijo}-${String(r.n).padStart(6, '0')}`;
+  return `${prefijo}-${String(r.n).padStart(6, "0")}`;
 }

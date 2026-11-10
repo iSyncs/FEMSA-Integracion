@@ -1,8 +1,14 @@
-import type { Auditoria, EstadoAuditoria, EstadoProcedimiento, EvaluacionProcedimiento, Procedimiento } from '../modelos';
-import type { Contexto } from '../../auth/decoradores';
-import type { AuditoriaVista, EvidenciaVista, ProcedimientoVista } from './vistas';
+import type {
+  Auditoria,
+  EstadoAuditoria,
+  EstadoProcedimiento,
+  EvaluacionProcedimiento,
+  Procedimiento,
+} from "../modelos";
+import type { Contexto } from "../../auth/decoradores";
+import type { AuditoriaVista, EvidenciaVista, ProcedimientoVista } from "./vistas";
 
-export type NuevaAuditoria = Omit<Auditoria, 'id' | 'tracking_id' | 'creado_en' | 'estado'>;
+export type NuevaAuditoria = Omit<Auditoria, "id" | "tracking_id" | "creado_en" | "estado">;
 
 export abstract class AuditoriasRepository {
   abstract listar(): Promise<AuditoriaVista[]>;

@@ -1,11 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import {
-  Acceso, Aprobacion, Auditoria, Avance, Cierre, Control, Evidencia, Hallazgo, Notificacion, Participante, Plan,
-  Procedimiento, PuntoPbc, RegistroBitacora, Riesgo, Rol, SolicitudPbcRegistro, UnidadNegocio, Usuario,
-} from '../modelos';
-import { sembrarDatosDemo } from './datos-demo';
+  Acceso,
+  Aprobacion,
+  Auditoria,
+  Avance,
+  Cierre,
+  Control,
+  Evidencia,
+  Hallazgo,
+  Notificacion,
+  Participante,
+  Plan,
+  Procedimiento,
+  PuntoPbc,
+  RegistroBitacora,
+  Riesgo,
+  Rol,
+  SolicitudPbcRegistro,
+  UnidadNegocio,
+  Usuario,
+} from "../modelos";
+import { sembrarDatosDemo } from "./datos-demo";
 
-const PREFIJOS = { aud: 'AUD', ap: 'AP', fnd: 'FND', rp: 'RP', soporte: 'SOPORTE', pbc: 'PBC' } as const;
+const PREFIJOS = { aud: "AUD", ap: "AP", fnd: "FND", rp: "RP", soporte: "SOPORTE", pbc: "PBC" } as const;
 type Secuencia = keyof typeof PREFIJOS;
 
 @Injectable()
@@ -55,7 +72,7 @@ export class BaseDeDatosMemoria {
   siguienteFolio(secuencia: Secuencia): string {
     const n = (this.secuencias.get(secuencia) ?? 0) + 1;
     this.secuencias.set(secuencia, n);
-    return `${PREFIJOS[secuencia]}-${String(n).padStart(6, '0')}`;
+    return `${PREFIJOS[secuencia]}-${String(n).padStart(6, "0")}`;
   }
 
   get colecciones(): number {

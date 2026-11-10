@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { AnalisisGuardado, SugerenciasIaRepository } from '../repositorios/sugerencias-ia.repository';
+import { Injectable } from "@nestjs/common";
+import { AnalisisGuardado, SugerenciasIaRepository } from "../repositorios/sugerencias-ia.repository";
 
 @Injectable()
 export class SugerenciasIaMemoriaRepository extends SugerenciasIaRepository {
@@ -19,7 +19,7 @@ export class SugerenciasIaMemoriaRepository extends SugerenciasIaRepository {
     return f ? (structuredClone(f) as AnalisisGuardado<P>) : null;
   }
 
-  async guardar<P>({ usuarioId: _usuario, ...d }: Omit<AnalisisGuardado<P>, 'id'> & { usuarioId: number }) {
+  async guardar<P>({ usuarioId: _usuario, ...d }: Omit<AnalisisGuardado<P>, "id"> & { usuarioId: number }) {
     const fila = { ...structuredClone(d), id: Math.max(0, ...this.filas.map((x) => x.id)) + 1 };
     this.filas.push(fila);
     return structuredClone(fila) as AnalisisGuardado<P>;

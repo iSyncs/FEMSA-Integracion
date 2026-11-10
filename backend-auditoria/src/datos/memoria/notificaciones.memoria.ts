@@ -1,11 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { BaseDeDatosMemoria } from './base-de-datos-memoria';
-import { NotificacionesRepository, NotificacionVista, NuevaNotificacion } from '../repositorios/notificaciones.repository';
-import type { Notificacion } from '../modelos';
+import { Injectable } from "@nestjs/common";
+import { BaseDeDatosMemoria } from "./base-de-datos-memoria";
+import {
+  NotificacionesRepository,
+  NotificacionVista,
+  NuevaNotificacion,
+} from "../repositorios/notificaciones.repository";
+import type { Notificacion } from "../modelos";
 
 @Injectable()
 export class NotificacionesMemoriaRepository extends NotificacionesRepository {
-  constructor(private readonly db: BaseDeDatosMemoria) { super(); }
+  constructor(private readonly db: BaseDeDatosMemoria) {
+    super();
+  }
 
   private vista(n: Notificacion): NotificacionVista {
     const plan = n.plan_id ? this.db.planes.find((p) => p.id === n.plan_id) : undefined;
@@ -13,21 +19,40 @@ export class NotificacionesMemoriaRepository extends NotificacionesRepository {
     const auditoriaId = n.auditoria_id ?? hallazgo?.auditoria_id ?? null;
     const auditoria = auditoriaId ? this.db.auditorias.find((a) => a.id === auditoriaId) : undefined;
     return {
-      id: n.id, usuario_id: n.usuario_id, tipo: n.tipo, mensaje: n.mensaje ?? '', fecha: n.fecha_envio ?? new Date(0), leida: n.leida,
-      plan_id: n.plan_id, plan_folio: plan?.tracking_id ?? null, auditoria_id: auditoriaId, auditoria_folio: auditoria?.tracking_id ?? null,
+      id: n.id,
+      usuario_id: n.usuario_id,
+      tipo: n.tipo,
+      mensaje: n.mensaje ?? "",
+      fecha: n.fecha_envio ?? new Date(0),
+      leida: n.leida,
+      plan_id: n.plan_id,
+      plan_folio: plan?.tracking_id ?? null,
+      auditoria_id: auditoriaId,
+      auditoria_folio: auditoria?.tracking_id ?? null,
     };
   }
 
   async crear(n: NuevaNotificacion) {
     this.db.notificaciones.push({
-      id: this.db.siguienteId('notificaciones'), usuario_id: n.usuarioId, plan_id: n.planId ?? null, auditoria_id: n.auditoriaId ?? null,
-      tipo: n.tipo, mensaje: n.mensaje.slice(0, 500), canal: 'plataforma', fecha_programada: null, fecha_envio: new Date(), leida: false,
+      id: this.db.siguienteId("notificaciones"),
+      usuario_id: n.usuarioId,
+      plan_id: n.planId ?? null,
+      auditoria_id: n.auditoriaId ?? null,
+      tipo: n.tipo,
+      mensaje: n.mensaje.slice(0, 500),
+      canal: "plataforma",
+      fecha_programada: null,
+      fecha_envio: new Date(),
+      leida: false,
     });
   }
 
   async listar(usuarioId: number, limite: number) {
-    return this.db.notificaciones.filter((n) => n.usuario_id === usuarioId)
-      .sort((a, b) => b.id - a.id).slice(0, limite).map((n) => this.vista(n));
+    return this.db.notificaciones
+      .filter((n) => n.usuario_id === usuarioId)
+      .sort((a, b) => b.id - a.id)
+      .slice(0, limite)
+      .map((n) => this.vista(n));
   }
 
   async noLeidas(usuarioId: number) {
@@ -45,7 +70,9 @@ export class NotificacionesMemoriaRepository extends NotificacionesRepository {
   }
 
   async yaEnviadaConFolio(usuarioId: number, tipo: string, folio: string) {
-    return this.db.notificaciones.some((n) => n.usuario_id === usuarioId && n.tipo === tipo && (n.mensaje ?? '').includes(folio));
+    return this.db.notificaciones.some(
+      (n) => n.usuario_id === usuarioId && n.tipo === tipo && (n.mensaje ?? "").includes(folio),
+    );
   }
 
   async yaEnviada(usuarioId: number, planId: number, tipo: string) {
