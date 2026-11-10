@@ -1,5 +1,5 @@
 // Ejecuta un script .sql (separado por GO) contra la base configurada en backend/.env.
-// Uso: npm run db:sql -- ../../auditoria_bd/scripts/ampliacion_eq12.sql
+// Uso (desde backend-auditoria): npm run db:sql -- ../db/migrations/001-ampliacion-eq12.sql
 const fs = require("node:fs");
 const path = require("node:path");
 const sql = require("mssql");

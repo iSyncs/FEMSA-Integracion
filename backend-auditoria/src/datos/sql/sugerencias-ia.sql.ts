@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ConexionSql } from "./conexion-sql";
 import { AnalisisGuardado, SugerenciasIaRepository } from "../repositorios/sugerencias-ia.repository";
 
-/** Tabla dbo.IA_ANALYSIS (script: datos/sql/scripts/ia_analysis.sql). */
+/** Tabla dbo.IA_ANALYSIS (migración: db/migrations/002-ia-analysis.sql). */
 type Fila = { id: number; auditoriaId: number; evidenciaId: number; lote: string; contenido: string };
 const COLUMNAS =
   "analysis_id AS id, audit_id AS auditoriaId, evidence_id AS evidenciaId, batch AS lote, payload AS contenido";

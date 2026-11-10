@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ConexionSql } from "./conexion-sql";
 import { NuevaSesion, SesionesRepository } from "../repositorios/sesiones.repository";
 
-/** Tabla dbo.USER_SESSION (script: datos/sql/scripts/user_session.sql). */
+/** Tabla dbo.USER_SESSION (migración: db/migrations/005-user-session.sql). */
 @Injectable()
 export class SesionesSqlRepository extends SesionesRepository {
   constructor(private readonly db: ConexionSql) {

@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ConexionSql, siguienteFolio } from "./conexion-sql";
 import { DocumentoLote, Lote, LotesRepository, NuevoLote } from "../repositorios/lotes.repository";
 
-/** Tablas dbo.IA_LOTE e IA_LOTE_EVIDENCE (script: datos/sql/scripts/ia_lote.sql). */
+/** Tablas dbo.IA_LOTE e IA_LOTE_EVIDENCE (migración: db/migrations/003-ia-lote.sql). */
 const SQL_LOTE = `
   SELECT l.lote_id AS id, l.tracking_id, l.audit_id AS auditoria_id, a.tracking_id AS auditoria_folio, a.name AS auditoria,
          l.request_pbc_id AS solicitud_pbc_id, l.sent_by AS enviado_por_id, u.full_name AS enviado_por, l.subject AS asunto,

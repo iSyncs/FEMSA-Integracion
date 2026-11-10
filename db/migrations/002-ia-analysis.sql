@@ -1,3 +1,10 @@
+-- 002-ia-analysis.sql
+-- Equipo: 2
+-- Viene de: Femsa-equipo-2 backend/src/datos/sql/scripts/ia_analysis.sql
+-- Estado: ya aplicada en E12_FEMSA
+-- Toca tablas compartidas: no (solo referencia a USER)
+-- Se puede correr dos veces: sí
+
 -- Análisis de IA guardados (Sugerencias de la IA). Uno por evidencia; el resultado va como JSON.
 -- Se puede correr más de una vez.
 IF OBJECT_ID('dbo.IA_ANALYSIS') IS NULL

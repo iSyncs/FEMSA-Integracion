@@ -1,3 +1,10 @@
+-- 006-request-pbc-detalle.sql
+-- Equipo: 2
+-- Viene de: Femsa-equipo-2 backend/src/datos/sql/scripts/request_pbc_detalle.sql
+-- Estado: ya aplicada en E12_FEMSA
+-- Toca tablas compartidas: no (solo referencia a USER)
+-- Se puede correr dos veces: sí
+
 -- FE1S-12 · HU_05 Solicitudes de información (PBC): folio, quién pide, a quién, fecha límite y los puntos solicitados.
 -- Solo agrega columnas y una tabla; las solicitudes existentes siguen funcionando.
 IF COL_LENGTH('dbo.REQUEST_PBC', 'tracking_id') IS NULL

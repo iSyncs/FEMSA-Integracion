@@ -74,7 +74,7 @@ export class UsuariosSqlRepository extends UsuariosRepository {
   }
 
   async credencial(correo: string) {
-    // La contraseña se guarda solo como hash bcrypt en dbo.[USER].password_hash (ver scripts/user_password.sql).
+    // La contraseña se guarda solo como hash bcrypt en dbo.[USER].password_hash (ver db/migrations/004-user-password.sql).
     const [u] = await this.db.consulta<{ id: number; contrasena_hash: string | null }>(
       `
       SELECT u.user_id AS id, u.password_hash AS contrasena_hash

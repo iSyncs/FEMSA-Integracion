@@ -27,4 +27,16 @@ END
 
 Para que dos equipos no tomen el mismo número, se reserva al abrir el PR: se revisa el último en `develop` y se toma el siguiente. Si dos PR chocan, el segundo renumera antes de mergear.
 
-Las migraciones actuales de cada equipo se importan en la Fase 2 (ver [docs/arquitectura/integracion.md](../../docs/arquitectura/integracion.md)).
+## Migraciones actuales
+
+| # | Equipo | Qué hace | Estado |
+|---|---|---|---|
+| 001 | 2 | Columnas y tablas que usa la API de auditoría (riesgos, participantes, bitácoras, catálogos) | Aplicada |
+| 002 | 2 | `IA_ANALYSIS`: análisis de IA guardados | Aplicada |
+| 003 | 2 | `IA_LOTE` e `IA_LOTE_EVIDENCE`: lotes de evidencia | Aplicada |
+| 004 | 2 | `USER.password_hash` (bcrypt) | Aplicada |
+| 005 | 2 | `USER_SESSION`: sesiones con cookie | Aplicada |
+| 006 | 2 | Detalle de solicitudes PBC y `REQUEST_PBC_ITEM` | Aplicada |
+| 007 | 2 | Índices de consultas frecuentes | Aplicada |
+
+Las migraciones de Maple (`001-auth`, `002-app-versions` y `003-ai-recommendations` en su repo) entran con los siguientes números libres cuando se mueva su backend.

@@ -3,7 +3,7 @@ import { ConexionSql, siguienteFolio } from "./conexion-sql";
 import { CambiosSolicitudPbc, NuevaSolicitudPbc, PbcRepository, SolicitudPbc } from "../repositorios/pbc.repository";
 import type { EstadoPuntoPbc, PuntoPbc } from "../modelos";
 
-/** Tablas dbo.REQUEST_PBC y dbo.REQUEST_PBC_ITEM (script: datos/sql/scripts/request_pbc_detalle.sql). */
+/** Tablas dbo.REQUEST_PBC y dbo.REQUEST_PBC_ITEM (migración: db/migrations/006-request-pbc-detalle.sql). */
 const SQL_SOLICITUD = `
   SELECT r.request_pbc_id AS id, r.tracking_id, r.procedure_id AS procedimiento_id, r.state AS estado, r.subject AS asunto,
          r.requested_by AS solicitado_por_id, r.requested_to AS solicitado_a_id, r.due_date AS fecha_limite, r.created_at AS creado,

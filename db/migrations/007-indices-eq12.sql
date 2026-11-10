@@ -1,3 +1,10 @@
+-- 007-indices-eq12.sql
+-- Equipo: 2
+-- Viene de: Femsa-equipo-2 backend/src/datos/sql/scripts/indices_eq12.sql
+-- Estado: ya aplicada en E12_FEMSA
+-- Toca tablas compartidas: no
+-- Se puede correr dos veces: sí
+
 -- FE1S-26 · Índices para las consultas más frecuentes del Equipo 12 y folios únicos.
 -- Solo crea índices (no cambia datos). Cada uno se crea si todavía no existe, así que se puede correr de nuevo.
 

@@ -1,3 +1,10 @@
+-- 005-user-session.sql
+-- Equipo: 2
+-- Viene de: Femsa-equipo-2 backend/src/datos/sql/scripts/user_session.sql
+-- Estado: ya aplicada en E12_FEMSA
+-- Toca tablas compartidas: no (tabla nueva con referencia a USER)
+-- Se puede correr dos veces: sí
+
 -- FE1S-37 · Sesiones del usuario. La cookie lleva un token aleatorio; aquí solo se guarda su SHA-256.
 IF OBJECT_ID('dbo.USER_SESSION') IS NULL
 BEGIN

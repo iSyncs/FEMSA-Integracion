@@ -1,3 +1,10 @@
+-- 003-ia-lote.sql
+-- Equipo: 2
+-- Viene de: Femsa-equipo-2 backend/src/datos/sql/scripts/ia_lote.sql
+-- Estado: ya aplicada en E12_FEMSA
+-- Toca tablas compartidas: no (solo referencia a USER)
+-- Se puede correr dos veces: sí
+
 -- Lotes de evidencia que el área auditada envía en respuesta a una solicitud PBC.
 -- Al llegar, la IA analiza cada PDF del lote sin que el auditor lo pida. Se puede correr más de una vez.
 IF OBJECT_ID('dbo.IA_LOTE') IS NULL
