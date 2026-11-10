@@ -1,0 +1,17 @@
+# SQL Server 2022 local para desarrollo (misma familia de motor que Azure SQL Database).
+# Uso: npm run db:up && npm run db:init
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: femsa-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      MSSQL_PID: Developer
+    ports:
+      - "14330:1433"
+    volumes:
+      - femsa-sqldata:/var/opt/mssql
+volumes:
+  femsa-sqldata:
